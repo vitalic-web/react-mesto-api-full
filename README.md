@@ -1,7 +1,9 @@
 # react-mesto-api-full
 
 **Публичный айпи сервера:** 178.154.226.196
+
 **Домен сервера:** api.vtl.students.nomoreparties.co
+
 **Ссылка на фронтенд:** https://github.com/vitalic-web/react-mesto-auth
 
 ## Описание
