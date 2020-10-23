@@ -30,9 +30,9 @@ const limiter = rateLimit({
 
 app.use(limiter);
 
-// разрешить запросы с хоста 3000 (реакт)
+// разрешить запросы с хоста (реакт)
 app.use(cors({
-  origin: 'http://vtl.students.nomoreparties.co',
+  origin: 'https://vtl.students.nomoreparties.co',
 }));
 
 app.use(express.json()); // метод для парсинга req.body
