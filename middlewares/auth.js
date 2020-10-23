@@ -1,9 +1,8 @@
+const { NODE_ENV, JWT_SECRET } = process.env;
 const jwt = require('jsonwebtoken');
 
 const auth = (req, res, next) => {
   const { authorization } = req.headers;
-
-  // console.log(`This is authorization: ${authorization}`);
 
   if (!authorization || !authorization.startsWith('Bearer ')) { // проверяем получили ли данные в нужном виде
     return res
@@ -13,12 +12,13 @@ const auth = (req, res, next) => {
 
   const token = authorization.replace('Bearer ', ''); // извлекаем токен без слова Bearer
 
-  // console.log(`This is token: ${token}`);
-
   let payload;
 
   try {
-    payload = jwt.verify(token, 'some-secret-key'); // попытаемся верифицировать токен
+    payload = jwt.verify(
+      token,
+      NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
+    ); // попытаемся верифицировать токен
   } catch (err) {
     return res
       .status(401)
@@ -26,8 +26,6 @@ const auth = (req, res, next) => {
   }
 
   req.user = payload; // записываем пейлоуд в объект запроса
-
-  // console.log(`This is req.user: ${req.user}`);
 
   next(); // пропускаем запрос дальше
 };

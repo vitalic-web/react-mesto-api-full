@@ -1,3 +1,4 @@
+const { NODE_ENV, JWT_SECRET } = process.env;
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/users');
@@ -58,7 +59,10 @@ const login = (req, res, next) => {
         });
     })
     .then((loggedUser) => {
-      const token = jwt.sign({ _id: loggedUser._id }, 'some-secret-key', { expiresIn: '7d' }); // создаем токен сроком на 7 дней
+      const token = jwt.sign(
+        { _id: loggedUser._id },
+        NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
+        { expiresIn: '7d' }); // создаем токен сроком на 7 дней
       if (!token) {
         throw new UnauthorizedError('Токен не найден');
       }
