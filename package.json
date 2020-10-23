@@ -11,9 +11,14 @@
   "author": "Vitaly Stekolshchikov",
   "license": "ISC",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "celebrate": "^13.0.3",
+    "cors": "^2.8.5",
     "express": "^4.17.1",
     "express-rate-limit": "^5.1.3",
-    "mongoose": "^5.10.5"
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.10.5",
+    "validator": "^13.1.17"
   },
   "devDependencies": {
     "eslint": "^7.8.1",
