@@ -1,6 +1,7 @@
 const Card = require('../models/cards');
 const BadRequestError = require('../errors/BadRequestError'); // 400
 const NotFoundError = require('../errors/NotFoundError'); // 404
+const ForbiddenError = require('../errors/ForbiddenError'); // 403
 
 // выгрузка всех карточек
 const getAllCards = (req, res, next) => {
@@ -32,9 +33,15 @@ const createCard = (req, res, next) => {
 
 // удаление карточки по id
 const deleteCardById = (req, res, next) => {
-  Card.findByIdAndRemove(req.params.cardId)
+  Card.findById(req.params.cardId)
     .orFail(new NotFoundError('Карточка не найдена'))
-    .then((card) => res.send({ data: card }))
+    .then((card) => {
+      if (card.owner.toString() === req.user._id.toString()) {
+        Card.findByIdAndRemove(card._id)
+          .then((result) => res.send({ data: result }))
+          .catch(next);
+      } else throw new ForbiddenError('Это не ваша карточка');
+    })
     .catch(next);
 };
 

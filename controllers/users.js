@@ -36,7 +36,7 @@ const createUser = (req, res, next) => {
       if (!user) {
         throw new BadRequestError('Введены некорректные данные');
       }
-      res.send({ data: user });
+      res.send({ message: `Пользователь ${user.email} успешно создан!` });
     })
     .catch(next);
 };
@@ -48,12 +48,12 @@ const login = (req, res, next) => {
   User.findOne({ email }).select('+password') // находим юзера по емейл
     .then((user) => {
       if (!user) {
-        return Promise.reject(new UnauthorizedError('Неправильные почта или пароль'));
+        throw new UnauthorizedError('Неправильные почта или пароль');
       }
       return bcrypt.compare(password, user.password) // проверяем совпадение паролей
         .then((matched) => {
           if (!matched) {
-            return Promise.reject(new UnauthorizedError('Неправильные почта или пароль'));
+            throw new UnauthorizedError('Неправильные почта или пароль');
           }
           return user; // если пароли совпали возвращаем данные юзера
         });
@@ -62,7 +62,8 @@ const login = (req, res, next) => {
       const token = jwt.sign(
         { _id: loggedUser._id },
         NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
-        { expiresIn: '7d' }); // создаем токен сроком на 7 дней
+        { expiresIn: '7d' },
+      ); // создаем токен сроком на 7 дней
       if (!token) {
         throw new UnauthorizedError('Токен не найден');
       }
@@ -74,6 +75,14 @@ const login = (req, res, next) => {
 // поиск юзера по id
 const getUserById = (req, res, next) => {
   User.findById(req.user._id)
+    .orFail(new NotFoundError('Пользователь не найден'))
+    .then((user) => res.send({ data: user }))
+    .catch(next);
+};
+
+// поиск юзера по айди в параметрах
+const getUserByIdInParams = (req, res, next) => {
+  User.findById(req.params.userId)
     .orFail(new NotFoundError('Пользователь не найден'))
     .then((user) => res.send({ data: user }))
     .catch(next);
@@ -130,6 +139,7 @@ module.exports = {
   getAllUsers,
   createUser,
   getUserById,
+  getUserByIdInParams,
   updateUserProfile,
   updateUserAvatar,
   login,
