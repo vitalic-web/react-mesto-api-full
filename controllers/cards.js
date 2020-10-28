@@ -5,13 +5,13 @@ const ForbiddenError = require('../errors/ForbiddenError'); // 403
 
 // выгрузка всех карточек
 const getAllCards = (req, res, next) => {
-  Card.find({})
+  Card.find({}).sort({ createdAt: -1 })
     .then((cards) => {
       if (!cards) {
         throw new NotFoundError('Карточки не найдены');
       }
 
-      res.send({ data: cards.reverse() });
+      res.send({ data: cards });
     })
     .catch(next);
 };
@@ -40,7 +40,8 @@ const deleteCardById = (req, res, next) => {
         Card.findByIdAndRemove(card._id)
           .then((result) => res.send({ data: result }))
           .catch(next);
-      } else throw new ForbiddenError('Это не ваша карточка');
+      }
+      throw new ForbiddenError('Это не ваша карточка');
     })
     .catch(next);
 };

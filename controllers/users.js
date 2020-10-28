@@ -5,6 +5,7 @@ const User = require('../models/users');
 const NotFoundError = require('../errors/NotFoundError');
 const BadRequestError = require('../errors/BadRequestError');
 const UnauthorizedError = require('../errors/UnauthorizedError');
+const ConflictError = require('../errors/ConflictError');
 
 // выгрузка всех юзеров
 const getAllUsers = (req, res, next) => {
@@ -19,7 +20,8 @@ const getAllUsers = (req, res, next) => {
     .catch(next);
 };
 
-// создание юзера
+// регистрация юзера
+
 const createUser = (req, res, next) => {
   const name = 'currentUser';
   const about = 'currentAbout';
@@ -28,15 +30,18 @@ const createUser = (req, res, next) => {
     email, password,
   } = req.body;
 
-  bcrypt.hash(password, 10) // хэширование пароля
-    .then((hash) => User.create({
-      name, about, avatar, email, password: hash,
-    }))
+  return User.findOne({ email })
     .then((user) => {
-      if (!user) {
-        throw new BadRequestError('Введены некорректные данные');
-      }
-      res.send({ message: `Пользователь ${user.email} успешно создан!` });
+      if (user) return next(new ConflictError('Пользователь с таким email уже существует'));
+
+      return bcrypt.hash(password, 10)
+        .then((hash) => {
+          User.create({
+            name, about, avatar, email, password: hash,
+          })
+            .then(() => res.send({ message: `Пользователь ${email} успешно создан!` }))
+            .catch(() => new BadRequestError('Введены некорректные данные'));
+        });
     })
     .catch(next);
 };

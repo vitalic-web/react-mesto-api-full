@@ -1,4 +1,4 @@
-const { celebrate, Joi } = require('celebrate');
+const { celebrate, Joi, CelebrateError } = require('celebrate');
 const { isURL } = require('validator');
 
 // валидация регистрации и аутентификации
@@ -18,16 +18,21 @@ const validateUserProfile = celebrate({
 
 const validateUserAvatar = celebrate({
   body: Joi.object().keys({
-    avatar: Joi.string().required().uri(),
+    avatar: Joi.string().required().custom((value) => {
+      if (!isURL(value)) {
+        throw new CelebrateError();
+      }
+      return value;
+    }),
   }),
 });
 
 const validateCreateCard = celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
-    link: Joi.string().required().custom((value, helpers) => {
+    link: Joi.string().required().custom((value) => {
       if (!isURL(value)) {
-        return helpers.error('Невалидная ссылка');
+        throw new CelebrateError();
       }
       return value;
     }),

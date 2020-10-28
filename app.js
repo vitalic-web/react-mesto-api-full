@@ -76,10 +76,11 @@ app.use((err, req, res, next) => {
     .send({
       message: status === 500
         ? 'На сервере произошла ошибка'
-        : message.message,
+        : message,
     });
 });
 
 app.listen(PORT, () => {
+  // eslint-disable-next-line no-console
   console.log(`App listening on port ${PORT}`);
 });
