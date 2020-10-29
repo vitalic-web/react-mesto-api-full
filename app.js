@@ -23,20 +23,16 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 });
 
 // создание лимита на запросы
-// const limiter = rateLimit({
-//   windowMs: 15 * 60 * 1000, // 15 minutes
-//   max: 100, // limit each IP to 100 requests per windowMs
-// });
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+});
 
-// app.use(limiter);
+app.use(limiter);
 
 // разрешить запросы с хоста (реакт)
-// app.use(cors({
-//   origin: 'https://vtl.students.nomoreparties.co',
-// }));
-
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: 'https://vtl.students.nomoreparties.co',
 }));
 
 app.use(express.json()); // метод для парсинга req.body
