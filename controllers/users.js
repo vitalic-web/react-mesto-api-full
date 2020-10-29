@@ -41,9 +41,9 @@ const createUser = (req, res, next) => {
             .then(() => res.send({ message: `Пользователь ${email} успешно создан!` }))
             .catch((err) => {
               if (err.name === 'ValidationError') {
-                return next(new BadRequestError('Введены некорректные данные'));
+                next(new BadRequestError('Введены некорректные данные'));
               }
-              return next(err);
+              next(err);
             });
         });
     })
