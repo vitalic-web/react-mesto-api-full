@@ -36,12 +36,12 @@ const deleteCardById = (req, res, next) => {
   Card.findById(req.params.cardId)
     .orFail(new NotFoundError('Карточка не найдена'))
     .then((card) => {
-      if (card.owner.toString() === req.user._id.toString()) {
-        Card.findByIdAndRemove(card._id)
-          .then((result) => res.send({ data: result }))
-          .catch(next);
+      if (card.owner.toString() !== req.user._id.toString()) {
+        throw new ForbiddenError('Это не ваша карточка');
       }
-      throw new ForbiddenError('Это не ваша карточка');
+      return Card.findByIdAndRemove(card._id)
+        .then((result) => res.send({ data: result }))
+        .catch(next);
     })
     .catch(next);
 };

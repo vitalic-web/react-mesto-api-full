@@ -21,7 +21,6 @@ const getAllUsers = (req, res, next) => {
 };
 
 // регистрация юзера
-
 const createUser = (req, res, next) => {
   const name = 'currentUser';
   const about = 'currentAbout';
@@ -40,7 +39,12 @@ const createUser = (req, res, next) => {
             name, about, avatar, email, password: hash,
           })
             .then(() => res.send({ message: `Пользователь ${email} успешно создан!` }))
-            .catch(() => new BadRequestError('Введены некорректные данные'));
+            .catch((err) => {
+              if (err.name === 'ValidationError') {
+                return next(new BadRequestError('Введены некорректные данные'));
+              }
+              return next(err);
+            });
         });
     })
     .catch(next);
